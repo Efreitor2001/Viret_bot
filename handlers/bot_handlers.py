@@ -269,7 +269,7 @@ async def brand_tailoring(message: types.Message, state: FSMContext):
 async def mark_tailoring(message: types.Message, state: FSMContext):
     async with state.proxy() as data_tailoring:
         data_tailoring['mark_tailoring'] = message.text
-    await bot.send_message(message.chat.id, 'Нужно ли Вам сделать декларацию соответсвия?', reply_markup=yesOrNo_kb)
+    await bot.send_message(message.chat.id, 'Нужно ли Вам сделать декларацию соответствия?', reply_markup=yesOrNo_kb)
     await TailoringStates.next()
 
 
@@ -290,7 +290,6 @@ async def photoshoot_tailoring(message: types.Message, state: FSMContext):
 async def get_payment_method_tailoring(message: types.Message, state: FSMContext):
     async with state.proxy() as data_tailoring:
         data_tailoring['payment_method_tailoring'] = message.text
-        print(data_tailoring)
     await bot.send_message(message.chat.id, "Где Вам было бы удобнее продолжить общение с менеджером?",
                            reply_markup=social_kb)
     await TailoringStates.next()
@@ -306,6 +305,20 @@ async def manager_tailoring(message: types.Message, state: FSMContext):
 async def phone_tailoring(message: types.Message, state: FSMContext):
     async with state.proxy() as data_tailoring:
         data_tailoring['phone_tailoring'] = message.text
+        print(data_tailoring)
+    await bot.send_photo(message.chat.id,
+                         photo=data_tailoring['photo_tailoring'],
+                         caption=f"Количество: {data_tailoring['count_tailoring']}\n"
+                                 f"Лекала / Образец: {data_tailoring['sample_tailoring']}\n"
+                                 f"Известны ли названия нужных тканей: {data_tailoring['cloth_names_quest_tailoring']}\n"
+                                 f"Названия тканей: {data_tailoring['cloth_names_list_tailoring']}\n"
+                                 f"Изделия под Вашим брендом: {data_tailoring['brand_tailoring']}\n"
+                                 f"Нужна ли маркировка: {data_tailoring['mark_tailoring']}\n"
+                                 f"Нужна ли декларация соответствия: {data_tailoring['declaration_tailoring']}\n"
+                                 f"Фотосессию сделать Нам: {data_tailoring['photoshoot_tailoring']}\n"
+                                 f"Способ оплаты: {data_tailoring['payment_method_tailoring']}\n"
+                                 f"Где продолжить общение с менеджером: {data_tailoring['manager_tailoring']}\n"
+                                 f"Ссылка / телефон для связи: {data_tailoring['phone_tailoring']}")
     await bot.send_message(message.chat.id, "Завка запонена!", reply_markup=mainMenu_kb)
     await state.finish()
 
