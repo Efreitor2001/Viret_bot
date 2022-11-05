@@ -4,23 +4,28 @@ button_mainMenu = KeyboardButton('📲 Главное меню')
 
 # --------------------------------- Main Menu ---------------------------------
 # button_terms = KeyboardButton('🤝 Условия сотрудничества')
-button_sewing = KeyboardButton('🪡🧵 Пошив')
-button_done = KeyboardButton('☑ Готовая продукция')
-button_cloth = KeyboardButton('🧶 Ткани')
+button_price = KeyboardButton('🧾 Рассчитать стоимость')
 button_support = KeyboardButton('🆘 Поддержка / Жалобы')
 button_promo = KeyboardButton('🎁 Скидки / Промокоды')
-button_ref = KeyboardButton('💌 Реферальная система')
+button_ref = KeyboardButton('📢 Реферальная система')
 button_about = KeyboardButton('ℹ О нас')
-mainMenu_kb = ReplyKeyboardMarkup(resize_keyboard=True).add(button_about).row(button_sewing,
-                                                                              button_cloth).add(
-    button_done) \
-    .row(button_promo, button_ref).add(button_support)
+mainMenu_kb = ReplyKeyboardMarkup(resize_keyboard=True).add(button_about).add(button_price).row(button_promo,
+                                                                                                button_ref).add(
+    button_support)
+# ---------------------------------------------------------------------------------------------------
+
+# --------------------------------- Price Menu ---------------------------------
+button_tailoring = KeyboardButton('🪡🧵 Индивидуальный пошив')
+button_done = KeyboardButton('👕 Готовая продукция')
+button_cloth = KeyboardButton('🧶 Ткани')
+button_menu = KeyboardButton('🔙 Вернуться в главное меню')
+priceMenu_kb = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True).add(button_tailoring).row(button_cloth,
+                                                                                                           button_done) \
+    .add(button_menu)
 # ---------------------------------------------------------------------------------------------------
 
 # --------------------------------- Registration Menu ---------------------------------
-button_email = KeyboardButton('📧 Отправить е-майл')
-email_kb = ReplyKeyboardMarkup(resize_keyboard=True).add(button_email)
-markup_request = ReplyKeyboardMarkup(resize_keyboard=True).add(
+markup_request = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True).add(
     KeyboardButton('Отправить свой контакт ☎️', request_contact=True)
 )
 # ---------------------------------------------------------------------------------------------------
@@ -36,6 +41,14 @@ button_cash = KeyboardButton('Наличными')
 button_card = KeyboardButton('Картой')
 button_rs = KeyboardButton('Расчётный счёт (+10% к стоимости)')
 payment_kb = ReplyKeyboardMarkup(resize_keyboard=True).row(button_cash, button_card).add(button_rs)
+# ----------------------------------------------------------------------------------------------------
+
+# --------------------------------- Social Networks ---------------------------------
+button_tg = KeyboardButton('Telegram')
+button_wa = KeyboardButton('WhatsApp')
+button_vk = KeyboardButton('ВКонтакте')
+social_kb = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True).add(button_tg).add(button_wa).add(
+    button_vk)
 # ----------------------------------------------------------------------------------------------------
 
 # --------------------------------- Skip ---------------------------------
