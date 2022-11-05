@@ -193,6 +193,14 @@ async def get_payment_method_clothes(message: types.Message, state: FSMContext):
 # ---------------------------------------------------------------------------------------------------
 
 # --------------------------------- Tailoring States ---------------------------------
+async def photo_checker_tailoring(message: types.Message):
+    await message.reply('Это не фотография!')
+
+
+async def sample_photo_checker_tailoring(message: types.Message):
+    await message.reply('Это не фотография!')
+
+
 async def get_name_tailoring(message: types.Message, state: FSMContext):
     async with state.proxy() as data_tailoring:
         data_tailoring['name_tailoring'] = message.text
@@ -328,10 +336,14 @@ def register_handlers_bot_handlers(dp: dp):
 
     # --------------------------------- Tailoring Handlers ---------------------------------
     dp.register_message_handler(get_name_tailoring, state=TailoringStates.name)
+    dp.register_message_handler(photo_checker_tailoring, lambda message: not message.photo, state=TailoringStates.photo)
     dp.register_message_handler(get_photo_tailoring, content_types='photo', state=TailoringStates.photo)
     dp.register_message_handler(get_count_tailoring, state=TailoringStates.count)
     dp.register_message_handler(sample_tailoring, state=TailoringStates.sample)
-    dp.register_message_handler(sample_photo_tailoring, content_types='photo', state=TailoringStates.sample_photo)
+    dp.register_message_handler(sample_photo_checker_tailoring, lambda message: not message.photo,
+                                state=TailoringStates.sample_photo)
+    dp.register_message_handler(sample_photo_tailoring, content_types='photo',
+                                state=TailoringStates.sample_photo)
     dp.register_message_handler(cloth_names_quest_tailoring, state=TailoringStates.cloth_names_quest)
     dp.register_message_handler(cloth_names_list_tailoring, state=TailoringStates.cloth_names_list)
     dp.register_message_handler(brand_tailoring, state=TailoringStates.brand)
