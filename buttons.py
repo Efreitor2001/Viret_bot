@@ -55,3 +55,8 @@ social_kb = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True).ad
 button_skip = KeyboardButton('Пропустить')
 skip_kb = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True).add(button_skip)
 # ----------------------------------------------------------------------------------------------------
+
+# --------------------------------- Stop ---------------------------------
+button_stop = KeyboardButton('🛑 Прекратить отправку фото')
+stop_kb = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True).add(button_stop)
+# ----------------------------------------------------------------------------------------------------

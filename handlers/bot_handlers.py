@@ -194,7 +194,11 @@ async def get_payment_method_clothes(message: types.Message, state: FSMContext):
 
 # --------------------------------- Tailoring States ---------------------------------
 async def photo_checker_tailoring(message: types.Message):
-    await message.reply('Это не фотография!')
+    if message.text != '🛑 Прекратить отправку фото':
+        await message.reply('Это не фотография!')
+    else:
+        await bot.send_message(message.chat.id, 'Какое количество Вы хотите отшить?')
+        await TailoringStates.next()
 
 
 async def sample_photo_checker_tailoring(message: types.Message):
@@ -210,9 +214,9 @@ async def get_name_tailoring(message: types.Message, state: FSMContext):
 
 async def get_photo_tailoring(message: types.Message, state: FSMContext):
     async with state.proxy() as data_tailoring:
-        data_tailoring['photo_tailoring'] = message.photo[0].file_id
-    await bot.send_message(message.chat.id, "Какое количество Вы хотите отшить?")
-    await TailoringStates.next()
+        data_tailoring[f'photo_tailoring'] = ', '.join(message.photo[0].file_id)
+    await bot.send_message(message.chat.id, 'Пришлите ещё фото или нажмите на кнопку чтобы продолжить',
+                           reply_markup=stop_kb)
 
 
 async def get_count_tailoring(message: types.Message, state: FSMContext):
@@ -220,6 +224,7 @@ async def get_count_tailoring(message: types.Message, state: FSMContext):
         data_tailoring['count_tailoring'] = message.text
     await bot.send_message(message.chat.id, 'Есть готовые лекала или образец на эту модель?',
                            reply_markup=yesOrNo_kb)
+    print(data_tailoring)
     await TailoringStates.next()
 
 
