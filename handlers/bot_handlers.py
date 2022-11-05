@@ -331,7 +331,7 @@ def register_handlers_bot_handlers(dp: dp):
     dp.register_message_handler(get_photo_tailoring, content_types='photo', state=TailoringStates.photo)
     dp.register_message_handler(get_count_tailoring, state=TailoringStates.count)
     dp.register_message_handler(sample_tailoring, state=TailoringStates.sample)
-    dp.register_message_handler(sample_photo_tailoring, state=TailoringStates.sample_photo)
+    dp.register_message_handler(sample_photo_tailoring, content_types='photo', state=TailoringStates.sample_photo)
     dp.register_message_handler(cloth_names_quest_tailoring, state=TailoringStates.cloth_names_quest)
     dp.register_message_handler(cloth_names_list_tailoring, state=TailoringStates.cloth_names_list)
     dp.register_message_handler(brand_tailoring, state=TailoringStates.brand)

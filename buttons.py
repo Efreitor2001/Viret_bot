@@ -1,6 +1,8 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
-button_mainMenu = KeyboardButton('📲 Главное меню')
+# --------------------------------- Back to Menu ---------------------------------
+button_menu = KeyboardButton('🔙 Вернуться в главное меню')
+# ---------------------------------------------------------------------------------------------------
 
 # --------------------------------- Main Menu ---------------------------------
 # button_terms = KeyboardButton('🤝 Условия сотрудничества')
@@ -9,16 +11,14 @@ button_support = KeyboardButton('🆘 Поддержка / Жалобы')
 button_promo = KeyboardButton('🎁 Скидки / Промокоды')
 button_ref = KeyboardButton('📢 Реферальная система')
 button_about = KeyboardButton('ℹ О нас')
-mainMenu_kb = ReplyKeyboardMarkup(resize_keyboard=True).add(button_about).add(button_price).row(button_promo,
-                                                                                                button_ref).add(
-    button_support)
+mainMenu_kb = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True).add(button_about).add(button_price).row(
+    button_promo, button_ref).add(button_support)
 # ---------------------------------------------------------------------------------------------------
 
 # --------------------------------- Price Menu ---------------------------------
 button_tailoring = KeyboardButton('🪡🧵 Индивидуальный пошив')
 button_done = KeyboardButton('👕 Готовая продукция')
 button_cloth = KeyboardButton('🧶 Ткани')
-button_menu = KeyboardButton('🔙 Вернуться в главное меню')
 priceMenu_kb = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True).add(button_tailoring).row(button_cloth,
                                                                                                            button_done) \
     .add(button_menu)
