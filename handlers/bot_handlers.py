@@ -1,13 +1,43 @@
 from aiogram import types
 from aiogram.dispatcher import FSMContext
-from aiogram.types import InputFile
-import re
+from aiogram.dispatcher.handler import CancelHandler
+from aiogram.dispatcher.middlewares import BaseMiddleware
+from aiogram.types import InputFile, InputMediaPhoto, InputMedia
+from aiogram.types import Message
 
 from create_bot import bot, dp
 from fsms import *
 from buttons import *
 import psycopg2
 from psycopg2 import OperationalError, Error
+from typing import Callable, Any, Awaitable, Union, List
+import asyncio
+
+
+class PhotoMiddleware(BaseMiddleware):
+    album_data: dict = {}
+
+    def __init__(self, latency: Union[int, float] = 0.01):
+        self.latency = latency
+        super().__init__()
+
+    async def on_process_message(self, message: types.Message, data: dict):
+        if not message.media_group_id:
+            return
+
+        try:
+            self.album_data[message.media_group_id].append(message)
+            raise CancelHandler()
+        except KeyError:
+            self.album_data[message.media_group_id] = [message]
+            await asyncio.sleep(self.latency)
+
+            message.conf["is_last"] = True
+            data["album"] = self.album_data[message.media_group_id]
+
+    async def on_post_process_message(self, message: types.Message, result: dict, data: dict):
+        if message.media_group_id and message.conf.get("is_last"):
+            del self.album_data[message.media_group_id]
 
 
 def create_connection():
@@ -212,9 +242,20 @@ async def get_name_tailoring(message: types.Message, state: FSMContext):
     await TailoringStates.next()
 
 
-async def get_photo_tailoring(message: types.Message, state: FSMContext):
+async def get_photo_tailoring(message: types.Message, state: FSMContext, album: List[types.Message]):
+    media_group = types.MediaGroup()
+    for obj in album:
+        if obj.photo:
+            file_id = obj.photo[-1].file_id
+        else:
+            file_id = obj[obj.content_type].file_id
+
+        try:
+            media_group.attach({"media": file_id, "type": obj.content_type})
+        except ValueError:
+            return await message.answer("This type of album is not supported by aiogram.")
     async with state.proxy() as data_tailoring:
-        data_tailoring[f'photo_tailoring'] = ', '.join(message.photo[0].file_id)
+        data_tailoring['photo_tailoring'] = media_group
     await bot.send_message(message.chat.id, 'Пришлите ещё фото или нажмите на кнопку чтобы продолжить',
                            reply_markup=stop_kb)
 
@@ -310,20 +351,21 @@ async def manager_tailoring(message: types.Message, state: FSMContext):
 async def phone_tailoring(message: types.Message, state: FSMContext):
     async with state.proxy() as data_tailoring:
         data_tailoring['phone_tailoring'] = message.text
-        print(data_tailoring)
-    await bot.send_photo(message.chat.id,
-                         photo=data_tailoring['photo_tailoring'],
-                         caption=f"Количество: {data_tailoring['count_tailoring']}\n"
-                                 f"Лекала / Образец: {data_tailoring['sample_tailoring']}\n"
-                                 f"Известны ли названия нужных тканей: {data_tailoring['cloth_names_quest_tailoring']}\n"
-                                 f"Названия тканей: {data_tailoring['cloth_names_list_tailoring']}\n"
-                                 f"Изделия под Вашим брендом: {data_tailoring['brand_tailoring']}\n"
-                                 f"Нужна ли маркировка: {data_tailoring['mark_tailoring']}\n"
-                                 f"Нужна ли декларация соответствия: {data_tailoring['declaration_tailoring']}\n"
-                                 f"Фотосессию сделать Нам: {data_tailoring['photoshoot_tailoring']}\n"
-                                 f"Способ оплаты: {data_tailoring['payment_method_tailoring']}\n"
-                                 f"Где продолжить общение с менеджером: {data_tailoring['manager_tailoring']}\n"
-                                 f"Ссылка / телефон для связи: {data_tailoring['phone_tailoring']}")
+    print(data_tailoring)
+    await bot.send_message(message.chat.id, 'Фотографии моделей:')
+    await bot.send_media_group(message.chat.id, data_tailoring['photo_tailoring'])
+    await bot.send_message(message.chat.id, "Ваша заявка:\n\n"
+                                            f"Количество: {data_tailoring['count_tailoring']}\n"
+                                            f"Лекала / Образец: {data_tailoring['sample_tailoring']}\n"
+                                            f"Известны ли названия нужных тканей: {data_tailoring['cloth_names_quest_tailoring']}\n"
+                                            f"Названия тканей: {data_tailoring['cloth_names_list_tailoring']}\n"
+                                            f"Изделия под Вашим брендом: {data_tailoring['brand_tailoring']}\n"
+                                            f"Нужна ли маркировка: {data_tailoring['mark_tailoring']}\n"
+                                            f"Нужна ли декларация соответствия: {data_tailoring['declaration_tailoring']}\n"
+                                            f"Фотосессию сделать Нам: {data_tailoring['photoshoot_tailoring']}\n"
+                                            f"Способ оплаты: {data_tailoring['payment_method_tailoring']}\n"
+                                            f"Где продолжить общение с менеджером: {data_tailoring['manager_tailoring']}\n"
+                                            f"Ссылка / телефон для связи: {data_tailoring['phone_tailoring']}")
     await bot.send_message(message.chat.id, "Завка запонена!", reply_markup=mainMenu_kb)
     await state.finish()
 
@@ -371,4 +413,10 @@ def register_handlers_bot_handlers(dp: dp):
     dp.register_message_handler(get_payment_method_tailoring, state=TailoringStates.payment_method)
     dp.register_message_handler(manager_tailoring, state=TailoringStates.manager)
     dp.register_message_handler(phone_tailoring, state=TailoringStates.phone)
+    # ---------------------------------------------------------------------------------------------------
+
+
+def register_middlewares_bot(dp: dp):
+    # --------------------------------- Middlewares ---------------------------------
+    dp.middleware.setup(PhotoMiddleware())
     # ---------------------------------------------------------------------------------------------------

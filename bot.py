@@ -4,6 +4,7 @@ from handlers import bot_handlers, bot_commands
 
 # bot_commands.register_handlers_bot_commands(dp)
 bot_handlers.register_handlers_bot_handlers(dp)
+bot_handlers.register_middlewares_bot(dp)
 
 if __name__ == '__main__':
     print('run')
